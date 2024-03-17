@@ -1,0 +1,5 @@
+[32mINFO[39m: [36mSome message[39m
+    ctx: {
+      "severity": "info",
+      "foo": "bar"
+    }

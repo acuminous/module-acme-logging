@@ -127,6 +127,20 @@ describe('Logging Conventions', () => {
     });
   });
 
+  it('should tolerate context objects with circular references', (t, done) => {
+    const logger = factory({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
+      deq(record.ctx, { severity: 'info', foo: 'bar', context: { context: '[Circular]', foo: 'bar' } })
+      eq(record.level, 30)
+      eq(record.msg, 'Some message')
+      done();
+    });
+    context = { foo: 'bar' };
+    context.context = context;
+    logger.info('Some message', context );
+  });
+
   it('should redact sensitive information', (t, done) => {
     const logger = factory({ test: true });
     logger.once('message', (record) => {

@@ -11,8 +11,8 @@ This module wraps pino, implementing the following best practices...
 - Reporting the source of empty log messages
 - Relocating the context to a subdocument to avoid name clashes (level, time, etc)
 - Ensuring errors are serialised correctly (pino#862, winston#1338, bunyan#514)
-- Ensuring circular references (pino#990, winston#1946, bunyan#427)
-- Ensuring unserialisable context objects
+- Ensuring circular references (pino#990, winston#1946, bunyan#427) are tolerated
+- Ensuring unserialisable context objects are tolerated
 
 This module isn't published to npm, the idea is for you to create your own organsational specific best practice module, potentially using this as an example.
 

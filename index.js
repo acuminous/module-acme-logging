@@ -42,6 +42,12 @@ function init(options = { machine: true }) {
     }] : [];
   };
 
+  const formatters = {
+    level (label, number) {
+      return { level: number, severity: label }
+    }
+  }
+
   const hooks = {
     /*
       Defines a custom logMethod that:
@@ -52,8 +58,7 @@ function init(options = { machine: true }) {
     logMethod(inputArgs, method, level) {
       const [message, ctx] = getArgs(inputArgs);
       const store = als.getStore() || {};
-      const severity = logger.levels.labels[level];
-      return method.apply(this, [{ ...store, ...ctx, severity }, message ]);
+      return method.apply(this, [{ ...store, ...ctx }, message ]);
     }
   }
 
@@ -69,6 +74,7 @@ function init(options = { machine: true }) {
 
   const logger = pino({
     base: null,
+    formatters,
     hooks,
     nestedKey: 'ctx',
     redact: {

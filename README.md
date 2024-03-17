@@ -30,7 +30,7 @@ logger.info('Some message', { foo: 'bar' });
 ```
 
 ```json
-{"level":30,"time":1710696070387,"ctx":{"foo":"bar","severity":"info"},"msg":"Some message"}
+{"level":30,"severity":"info","time":1710696070387,"ctx":{"foo":"bar"},"msg":"Some message"}
 ```
 
 ### Human friendly logging
@@ -86,7 +86,7 @@ function doStuff() {
 ```
 
 ```json
-{"level":30,"time":1710696070387,"ctx":{"tracer":123,"foo":"bar","severity":"info"},"msg":"Some message"}
+{"level":30,"severity":"info","time":1710696070387,"ctx":{"tracer":123,"foo":"bar"},"msg":"Some message"}
 ```
 
 ### Redaction
@@ -97,7 +97,7 @@ logger.info('Some message', { foo: 'bar' });
 ```
 
 ```json
-{"level":30,"time":1710696070387,"ctx":{"foo":"[Redacted]","severity":"info"},"msg":"Some message"}
+{"level":30,"severity":"info","time":1710696070387,"ctx":{"foo":"[Redacted]"},"msg":"Some message"}
 ```
 
 ### Reporting the source of empty log messages
@@ -107,7 +107,7 @@ logger.info(undefined);
 ```
 
 ```json
-{"level":50,"time":1710696172704,"ctx":{"err":{"type":"Error","message":"Empty log message"},"severity":"info"},"msg":"Empty log message!"}
+{"level":50,"severity":"info","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Empty log message"}},"msg":"Empty log message!"}
 
 ```
 The stack trace was omitted for brevity in the readme, but will be logged irl
@@ -119,7 +119,7 @@ logger.error(new Error("Oh Noes!"));
 ```
 
 ```json
-{"level":50,"time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"},"severity":"error"},"msg":"Oh Noes!"}
+{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"msg":"Oh Noes!"}
 ```
 The stack trace was omitted for brevity in the readme, but will be logged irl
 

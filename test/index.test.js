@@ -18,12 +18,13 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting both message and context parameters', (t, done) => {
-    const logger = init();
+    const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
-      deq(record.ctx, { severity: 'info', foo: 'bar' })
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      deq(record.ctx, { foo: 'bar' })
       eq(record.level, 30)
       eq(record.msg, 'Some message')
+      eq(record.severity, 'info');
       done();
     });
     logger.info('Some message', { foo: 'bar' } );
@@ -32,10 +33,10 @@ describe('Logging Conventions', () => {
   it('should expose a conventional API supporting just a string parameter', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
-      deq(record.ctx, { severity: 'info' })
+      deq(Object.keys(record).sort(), ['level', 'msg', 'severity', 'time'])
       eq(record.level, 30)
       eq(record.msg, 'Some message')
+      eq(record.severity, 'info');
       done();
     });
     logger.info('Some message');
@@ -71,12 +72,13 @@ describe('Logging Conventions', () => {
   it('should expose a conventional API supporting just an error parameter', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
       deq(record.ctx.err.type, 'Error');
       deq(record.ctx.err.message, 'Oh Noes!');
       ok(record.ctx.err.stack);
       eq(record.level, 50)
       eq(record.msg, 'Oh Noes!')
+      eq(record.severity, 'error');
       done();
     });
     logger.error(new Error('Oh Noes!'));
@@ -116,9 +118,9 @@ describe('Logging Conventions', () => {
 
   it('should support asynchronous context tracking', (t, done) => {
     const als = new AsyncLocalStorage();
-    const logger = init({ als, machine: true, test: true });
+    const logger = init({ als, test: true });
     logger.once('message', (record) => {
-      deq(record.ctx, { severity: 'info', foo: 'bar', tracer: 123 })
+      deq(record.ctx, { foo: 'bar', tracer: 123 })
       done();
     });
 
@@ -131,7 +133,7 @@ describe('Logging Conventions', () => {
     const als = new AsyncLocalStorage();
     const logger = init({ als, test: true });
     logger.once('message', (record) => {
-      deq(record.ctx, { severity: 'info', foo: 'bar', tracer: 123 })
+      deq(record.ctx, { foo: 'bar', tracer: 123 })
       done();
     });
 
@@ -143,10 +145,7 @@ describe('Logging Conventions', () => {
   it('should tolerate context objects with circular references', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
-      deq(record.ctx, { severity: 'info', foo: 'bar', context: { context: '[Circular]', foo: 'bar' } })
-      eq(record.level, 30)
-      eq(record.msg, 'Some message')
+      deq(record.ctx, { foo: 'bar', context: { context: '[Circular]', foo: 'bar' } })
       done();
     });
     context = { foo: 'bar' };
@@ -157,10 +156,7 @@ describe('Logging Conventions', () => {
   it('should tolerate context objects with unserialisable types', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
-      deq(record.ctx, { severity: 'info', foo: 'bar' })
-      eq(record.level, 30)
-      eq(record.msg, 'Some message')
+      deq(record.ctx, { foo: 'bar' })
       done();
     });
     logger.info('Some message', { foo: 'bar', fn: () => {} });
@@ -170,9 +166,8 @@ describe('Logging Conventions', () => {
   it('should redact sensitive information', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
-      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
       deq(record.ctx, {
-        severity: 'info',
         password: '[Redacted]',
         email: '[Redacted]',
         user: {

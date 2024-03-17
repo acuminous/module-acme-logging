@@ -14,9 +14,9 @@ This module wraps pino, implementing the following best practices...
 - Ensuring circular references (pino#990, winston#1946, bunyan#427)
 - Ensuring unserialisable context objects
 
-## Usage
+This module isn't published to npm, the idea is for you to create your own organsational specific best practice module, potentially using this as an example.
 
-This module isn't published to npm, the idea is for you to create your own, organsational specific best practice factory module
+## Usage
 
 ### Machine friendly logging
 ```js

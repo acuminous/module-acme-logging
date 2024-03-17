@@ -47,8 +47,7 @@ logger.info('Some message', { foo: 'bar' });
 ```
 INFO: Some message
     ctx: {
-      "foo": "bar",
-      "severity": "info"
+      "foo": "bar"
     }
 ```
 

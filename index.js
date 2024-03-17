@@ -3,12 +3,16 @@ const pino = require('pino');
 
 module.exports = function factory(options = { machine: true }) {
 
+  // https://github.com/pinojs/pino-pretty?tab=readme-ov-file#usage-with-jest
+  const sync = options?.sync || Boolean(options?.test) || false;
+
   function configureMachineLogger() {
     return (options?.machine) ? [{
       target: 'pino/file',
       level: options?.machine?.level || 'info',
       options: {
-        destination: options?.machine?.destination || 1
+        destination: options?.machine?.destination || 1,
+        sync,
       }
     }] : [];
   }
@@ -20,7 +24,7 @@ module.exports = function factory(options = { machine: true }) {
       options: {
         destination: options?.human?.destination || 1,
         ignore: 'time,severity',
-        sync: true, // https://github.com/pinojs/pino-pretty?tab=readme-ov-file#usage-with-jest
+        sync,
       }
     }] : [];
   }

@@ -5,7 +5,7 @@ const { AsyncLocalStorage } = require('node:async_hooks');
 const { ok, strictEqual: eq, deepStrictEqual: deq, match } = require('node:assert');
 const { before, describe, it } = require('zunit');
 
-const factory = require('..');
+const { init } = require('..');
 
 describe('Logging Conventions', () => {
 
@@ -18,7 +18,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting both message and context parameters', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init();
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx, { severity: 'info', foo: 'bar' })
@@ -30,7 +30,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting just a string parameter', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx, { severity: 'info' })
@@ -42,7 +42,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting just a numeric parameter', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       eq(record.msg, 1)
       done();
@@ -51,7 +51,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting just a bigint parameter', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       eq(record.msg, '12345678901234567890')
       done();
@@ -60,7 +60,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting just a boolean parameter', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       eq(record.msg, 1)
       done();
@@ -69,7 +69,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should expose a conventional API supporting just an error parameter', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx.err.type, 'Error');
@@ -83,7 +83,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should serialise custom error properties', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(record.ctx.err.wibble, 123);
       done();
@@ -92,7 +92,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should report the source of empty logs', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       eq(record.msg, 'Empty log message');
       eq(record.ctx.err.message, 'Empty log message');
@@ -104,7 +104,7 @@ describe('Logging Conventions', () => {
 
   it('should support human friendly format', (t, done) => {
     const destination = path.join('test', 'logs', t.name.replace(/ /g, '-')) + '.log';
-    const logger = factory({ human: { destination }});
+    const logger = init({ human: { destination }});
     logger.info('Some message', { foo: 'bar' } );
 
     setTimeout(() => {
@@ -116,7 +116,7 @@ describe('Logging Conventions', () => {
 
   it('should support asynchronous context tracking', (t, done) => {
     const als = new AsyncLocalStorage();
-    const logger = factory({ als, test: true });
+    const logger = init({ als, machine: true, test: true });
     logger.once('message', (record) => {
       deq(record.ctx, { severity: 'info', foo: 'bar', tracer: 123 })
       done();
@@ -129,7 +129,7 @@ describe('Logging Conventions', () => {
 
   it('should prefer context object attributes to asynchronous context tracking ones', (t, done) => {
     const als = new AsyncLocalStorage();
-    const logger = factory({ als, test: true });
+    const logger = init({ als, test: true });
     logger.once('message', (record) => {
       deq(record.ctx, { severity: 'info', foo: 'bar', tracer: 123 })
       done();
@@ -141,7 +141,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should tolerate context objects with circular references', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx, { severity: 'info', foo: 'bar', context: { context: '[Circular]', foo: 'bar' } })
@@ -155,7 +155,7 @@ describe('Logging Conventions', () => {
   });
 
   it('should tolerate context objects with unserialisable types', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx, { severity: 'info', foo: 'bar' })
@@ -168,7 +168,7 @@ describe('Logging Conventions', () => {
 
 
   it('should redact sensitive information', (t, done) => {
-    const logger = factory({ test: true });
+    const logger = init({ test: true });
     logger.once('message', (record) => {
       deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
       deq(record.ctx, {

@@ -1,10 +1,16 @@
 const path = require('node:path');
+const { AsyncLocalStorage } = require('node:async_hooks');
 const pino = require('pino');
 
-module.exports = function factory(options = { machine: true }) {
+module.exports = {
+  init
+}
+
+function init(options = { machine: true }) {
 
   // https://github.com/pinojs/pino-pretty?tab=readme-ov-file#usage-with-jest
   const sync = options?.sync || Boolean(options?.test) || false;
+  const als = options?.als || new AsyncLocalStorage();
 
   function configureMachineLogger() {
     return (options?.machine) ? [{
@@ -45,7 +51,7 @@ module.exports = function factory(options = { machine: true }) {
     */
     logMethod(inputArgs, method, level) {
       const [message, ctx] = getArgs(inputArgs);
-      const store = options.als?.getStore() || {};
+      const store = als.getStore() || {};
       const severity = logger.levels.labels[level];
       return method.apply(this, [{ ...store, ...ctx, severity }, message ]);
     }
@@ -84,6 +90,9 @@ module.exports = function factory(options = { machine: true }) {
   transport.on('message', (...args) => {
     logger.emit('message', ...args);
   })
+
+  module.exports.logger = logger;
+  module.exports.als = als;
 
   return logger;
 }

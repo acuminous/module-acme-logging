@@ -39,7 +39,6 @@ module.exports = function factory(options = { machine: true }) {
   const hooks = {
     /*
       Defines a custom logMethod that:
-
         1. Exposes a conventional logging API, i.e. logger.info(message, [context])
         2. Logs the message severity
         3. Merges the asynchronous local storage store and the context, prefering the latter
@@ -70,10 +69,12 @@ module.exports = function factory(options = { machine: true }) {
       // pino's redaction library is severely limited :(
       // https://github.com/davidmarkclements/fast-redact/issues/5
       paths: [
-        'email',
         'password',
-        '*.email',
+        'email',
         '*.password',
+        '*.email',
+        '*[*].password',
+        '*[*].email',
         '*.headers.*',
         '*.*.headers.*',
       ].concat(options?.redact?.paths || []),

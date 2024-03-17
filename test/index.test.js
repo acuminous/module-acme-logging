@@ -179,6 +179,10 @@ describe('Logging Conventions', () => {
           password: '[Redacted]',
           email: '[Redacted]',
         },
+        users: [{
+          password: '[Redacted]',
+          email: '[Redacted]',
+        }],
         request: {
           headers: {
             'Authorization': '[Redacted]',
@@ -203,6 +207,12 @@ describe('Logging Conventions', () => {
         password: 'secret',
         email: 'secret',
       },
+      users: [
+        {
+          password: 'secret',
+          email: 'secret',
+        }
+      ],
       request: {
         headers: {
           Authorization: 'secret'

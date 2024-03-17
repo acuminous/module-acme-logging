@@ -152,5 +152,5 @@ logger.error('Some message', { error: new Error('Oh Noes!') });
 all result in...
 
 ```json
-{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"stack":"...","msg":"Some message"}
+{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Some message"}
 ```

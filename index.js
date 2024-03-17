@@ -47,7 +47,7 @@ module.exports = function factory(options = { machine: true }) {
     logMethod(inputArgs, method, level) {
       const [message, ctx] = getArgs(inputArgs);
       const store = options.als?.getStore() || {};
-      const severity = pino.levels.labels[level];
+      const severity = logger.levels.labels[level];
       return method.apply(this, [{ ...store, ...ctx, severity }, message ]);
     }
   }

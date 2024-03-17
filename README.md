@@ -2,7 +2,7 @@
 
 This module wraps pino, providing the following convensions, features and safeguards
 
-- Redacts sensitive content
+- Supports redaction of sensitive content
 - Supports machine friendly logging
 - Supports human friendly logging
 - Supports emitting log records as events

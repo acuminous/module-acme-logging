@@ -15,7 +15,7 @@ describe('Logging Conventions', () => {
       .filter((filename) => path.extname(filename) === '.log')
       .map((filename) => path.join(directory, filename))
       .forEach((filename) => fs.unlinkSync(filename));
-  })
+  });
 
   it('should expose a conventional API supporting both message and context parameters', (t, done) => {
     const logger = factory({ test: true });

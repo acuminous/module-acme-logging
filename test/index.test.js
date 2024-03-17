@@ -141,6 +141,19 @@ describe('Logging Conventions', () => {
     logger.info('Some message', context );
   });
 
+  it('should tolerate context objects with unserialisable types', (t, done) => {
+    const logger = factory({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'time'])
+      deq(record.ctx, { severity: 'info', foo: 'bar' })
+      eq(record.level, 30)
+      eq(record.msg, 'Some message')
+      done();
+    });
+    logger.info('Some message', { foo: 'bar', fn: () => {} });
+  });
+
+
   it('should redact sensitive information', (t, done) => {
     const logger = factory({ test: true });
     logger.once('message', (record) => {

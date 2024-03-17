@@ -48,7 +48,7 @@ module.exports = function factory(options = { machine: true }) {
       const [message, ctx] = getArgs(inputArgs);
       const store = options.als?.getStore() || {};
       const severity = pino.levels.labels[level];
-      return method.apply(this, [{ severity, ...ctx, ...store }, message ]);
+      return method.apply(this, [{ ...store, ...ctx, severity }, message ]);
     }
   }
 

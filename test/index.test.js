@@ -127,6 +127,19 @@ describe('Logging Conventions', () => {
     });
   });
 
+  it('should prefer context object attributes to asynchronous context tracking ones', (t, done) => {
+    const als = new AsyncLocalStorage();
+    const logger = factory({ als, test: true });
+    logger.once('message', (record) => {
+      deq(record.ctx, { severity: 'info', foo: 'bar', tracer: 123 })
+      done();
+    });
+
+    als.run({ tracer: 123, foo: 'baz' }, () => {
+      logger.info('Some message', { foo: 'bar' } );
+    });
+  });
+
   it('should tolerate context objects with circular references', (t, done) => {
     const logger = factory({ test: true });
     logger.once('message', (record) => {

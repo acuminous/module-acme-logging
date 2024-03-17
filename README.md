@@ -130,9 +130,8 @@ logger.error({ error: new Error('Oh Noes!') });
 all result in...
 
 ```json
-{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"msg":"Oh Noes!"}
+{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Oh Noes!"}
 ```
-The stack trace was omitted for brevity in the readme, but will be logged irl
 
 
 ```js
@@ -152,8 +151,6 @@ logger.error('Some message', { error: new Error('Oh Noes!') });
 
 all result in...
 
-
 ```json
-{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"msg":"Some message"}
+{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"stack":"...","msg":"Some message"}
 ```
-The stack trace was omitted for brevity in the readme, but will be logged irl

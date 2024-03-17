@@ -114,11 +114,46 @@ The stack trace was omitted for brevity in the readme, but will be logged irl
 ### Error serialisation
 ```js
 const { logger } = require('module-acme-logging');
-logger.error(new Error("Oh Noes!"));
+logger.error(new Error('Oh Noes!'));
 ```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.error({ err: new Error('Oh Noes!') });
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.error({ error: new Error('Oh Noes!') });
+```
+
+all result in...
 
 ```json
 {"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"msg":"Oh Noes!"}
 ```
 The stack trace was omitted for brevity in the readme, but will be logged irl
 
+
+```js
+const { logger } = require('module-acme-logging');
+logger.error('Some message', new Error('Oh Noes!'));
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.error('Some message', { err: new Error('Oh Noes!') });
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.error('Some message', { error: new Error('Oh Noes!') });
+```
+
+all result in...
+
+
+```json
+{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!"}},"msg":"Some message"}
+```
+The stack trace was omitted for brevity in the readme, but will be logged irl

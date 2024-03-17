@@ -84,6 +84,47 @@ describe('Logging Conventions', () => {
     logger.error(new Error('Oh Noes!'));
   });
 
+  it('should expose a conventional API supporting both message and error parameters', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      deq(record.ctx.err.type, 'Error');
+      deq(record.ctx.err.message, 'Oh Noes!');
+      ok(record.ctx.err.stack);
+      eq(record.level, 50)
+      eq(record.msg, 'Some message')
+      eq(record.severity, 'error');
+      done();
+    });
+    logger.error('Some message', new Error('Oh Noes!'));
+  });
+
+  it('should serialise an error nested under \'error\' in the context parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      deq(record.ctx.err.type, 'Error');
+      deq(record.ctx.err.message, 'Oh Noes!');
+      ok(record.ctx.err.stack);
+      eq(record.msg, 'Some message')
+      done();
+    });
+    logger.error('Some message', { error: new Error('Oh Noes!') });
+  });
+
+  it('should serialise an error nested under \'err\' in the context parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      deq(record.ctx.err.type, 'Error');
+      deq(record.ctx.err.message, 'Oh Noes!');
+      ok(record.ctx.err.stack);
+      eq(record.msg, 'Some message')
+      done();
+    });
+    logger.error('Some message', { err: new Error('Oh Noes!') });
+  });
+
   it('should serialise custom error properties', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {

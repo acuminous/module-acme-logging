@@ -45,7 +45,11 @@ function init(options = { machine: true }) {
   const formatters = {
     level (label, number) {
       return { level: number, severity: label }
-    }
+    },
+    log (object) {
+      const { error, ...context } = object;
+      return { err: error, ...context }
+    },
   }
 
   const hooks = {
@@ -119,7 +123,8 @@ function init(options = { machine: true }) {
 
 function getArgs(inputArgs) {
   let args;
-  if (inputArgs.length >= 2) args = inputArgs.slice(0, 2);
+  if (inputArgs.length >= 2 && inputArgs[1] instanceof Error) args = [inputArgs[0], { err: inputArgs[1] }];
+  else if (inputArgs.length >= 2) args = inputArgs.slice(0, 2);
   else if (inputArgs.length === 1 && ['boolean', 'number', 'string'].includes(typeof inputArgs[0])) args = inputArgs;
   else if (inputArgs.length === 1 && typeof inputArgs[0] === 'bigint') args = [String(inputArgs[0])];
   else if (inputArgs.length === 1 && inputArgs[0] instanceof Error) args = [undefined, { err: inputArgs[0] }];

@@ -10,8 +10,8 @@ This module wraps pino, implementing the following best practices...
 - Support for redaction of sensitive content
 - Reporting the source of empty log messages
 - Relocating the context to a subdocument to avoid name clashes (level, time, etc)
-- Ensuring errors are serialised correctly ([pino#862](https://github.com/pinojs/pino/issues/862), [winston#1338](https://github.com/winstonjs/winston/issues/1338), [bunyan#717](https://github.com/trentm/node-bunyan/issues/514))
-- Ensuring circular references are tolerated ([pino#990](https://github.com/pinojs/pino/issues/990), [winston#1946](https://github.com/winstonjs/winston/issues/1946), [bunyan#717](https://github.com/trentm/node-bunyan/issues/427))
+- Ensuring errors are serialised correctly ([pino#862](https://github.com/pinojs/pino/issues/862), [winston#1338](https://github.com/winstonjs/winston/issues/1338), [bunyan#514](https://github.com/trentm/node-bunyan/issues/514))
+- Ensuring circular references are tolerated ([pino#990](https://github.com/pinojs/pino/issues/990), [winston#1946](https://github.com/winstonjs/winston/issues/1946), [bunyan#427](https://github.com/trentm/node-bunyan/issues/427))
 - Ensuring unserialisable context objects are tolerated
 
 This module isn't published to npm, the idea is for you to create your own organsational specific best practice module, potentially using this as an example.

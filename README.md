@@ -12,6 +12,7 @@ This module wraps pino, implementing the following best practices...
 - Relocating the context to a subdocument to avoid name clashes (level, time, etc)
 - Ensuring errors are serialised correctly ([pino#862](https://github.com/pinojs/pino/issues/862), [winston#1338](https://github.com/winstonjs/winston/issues/1338), [bunyan#514](https://github.com/trentm/node-bunyan/issues/514))
 - Ensuring circular references are tolerated ([pino#990](https://github.com/pinojs/pino/issues/990), [winston#1946](https://github.com/winstonjs/winston/issues/1946), [bunyan#427](https://github.com/trentm/node-bunyan/issues/427))
+- Ensuring dates are serialised correctly
 - Ensuring unserialisable context objects are tolerated
 
 This module isn't published to npm, the idea is for you to create your own organsational specific best practice module, potentially using this as an example.
@@ -106,7 +107,7 @@ logger.info(undefined);
 ```
 
 ```json
-{"level":50,"severity":"info","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Empty log message"}},"msg":"Empty log message!"}
+{"level":50,"severity":"info","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Empty log message"}},"msg":"Empty log message!"}
 
 ```
 The stack trace was omitted for brevity in the readme, but will be logged irl
@@ -130,7 +131,7 @@ logger.error({ error: new Error('Oh Noes!') });
 all result in...
 
 ```json
-{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Oh Noes!"}
+{"level":50,"severity":"error","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Oh Noes!"}
 ```
 
 
@@ -152,5 +153,33 @@ logger.error('Some message', { error: new Error('Oh Noes!') });
 all result in...
 
 ```json
-{"level":50,"severity":"error","time":1710696172704,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Some message"}
+{"level":50,"severity":"error","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Oh Noes!","stack":"..."}},"msg":"Some message"}
+```
+
+### Date serialisation
+```js
+const { logger } = require('module-acme-logging');
+logger.info(new Date('2024-02-02T00:00:00.000Z'));
+```
+
+```json
+{"level":30,"severity":"info","time":1710696070387,"ctx":{"ts":"2024-02-02T00:00:00.000Z"}}
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.info("Some message", new Date('2024-02-02T00:00:00.000Z'));
+```
+
+```json
+{"level":30,"severity":"info","time":1710696070387,"msg":"Some Message","ctx":{"ts":"2024-02-02T00:00:00.000Z"}}
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.info("Some message", { groundhogDay: new Date('2024-02-02T00:00:00.000Z') });
+```
+
+```json
+{"level":30,"severity":"info","time":1710696070387,"msg":"Some Message","ctx":{"groundhogDay":"2024-02-02T00:00:00.000Z"}}
 ```

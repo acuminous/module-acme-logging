@@ -69,6 +69,31 @@ describe('Logging Conventions', () => {
     logger.info(1);
   });
 
+  it('should expose a conventional API supporting just a date parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'severity', 'time'])
+      eq(record.level, 30)
+      eq(record.ctx.ts, '2024-02-02T00:00:00.000Z')
+      eq(record.severity, 'info');
+      done();
+    });
+    logger.info(new Date('2024-02-02T00:00:00.000Z'));
+  });
+
+  it('should expose a conventional API supporting both message and date parameters', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      eq(record.level, 50)
+      eq(record.msg, 'Some message')
+      eq(record.ctx.ts, '2024-02-02T00:00:00.000Z')
+      eq(record.severity, 'error');
+      done();
+    });
+    logger.error('Some message', new Date('2024-02-02T00:00:00.000Z'));
+  });
+
   it('should expose a conventional API supporting just an error parameter', (t, done) => {
     const logger = init({ test: true });
     logger.once('message', (record) => {
@@ -202,7 +227,6 @@ describe('Logging Conventions', () => {
     });
     logger.info('Some message', { foo: 'bar', fn: () => {} });
   });
-
 
   it('should redact sensitive information', (t, done) => {
     const logger = init({ test: true });

@@ -159,17 +159,6 @@ describe('Logging Conventions', () => {
     logger.error(Object.assign(new Error('Oh Noes!'), { wibble: 123 }));
   });
 
-  it('should report the source of empty logs', (t, done) => {
-    const logger = init({ test: true });
-    logger.once('message', (record) => {
-      eq(record.msg, 'Empty log message');
-      eq(record.ctx.err.message, 'Empty log message');
-      match(record.ctx.err.stack, /index.test.js/);
-      done();
-    });
-    logger.info();
-  });
-
   it('should support human friendly format', (t, done) => {
     const destination = path.join('test', 'logs', t.name.replace(/ /g, '-')) + '.log';
     const logger = init({ human: { destination }});
@@ -286,5 +275,83 @@ describe('Logging Conventions', () => {
         }
       }
     });
+  });
+
+  it('should report the source of empty records', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      eq(record.msg, 'Empty log message');
+      eq(record.ctx.err.message, 'Empty log message');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info();
+  });
+
+  it('should report the source of undefined message parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      eq(record.msg, 'Empty log message');
+
+      deq(Object.keys(record.ctx).sort(), ['err'])
+      eq(record.ctx.err.message, 'Empty log message');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info(undefined);
+  });
+
+  it('should report the source of null message parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      eq(record.msg, 'Empty log message');
+
+      deq(Object.keys(record.ctx).sort(), ['err'])
+      eq(record.ctx.err.message, 'Empty log message');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info(null);
+  });
+
+  it('should report the source of blank message parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      eq(record.msg, 'Empty log message');
+
+      deq(Object.keys(record.ctx).sort(), ['err'])
+      eq(record.ctx.err.message, 'Empty log message');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info('   ');
+  });
+
+  it('should report the source of oversized message parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      eq(record.msg, 'Log record size of 10,007 bytes exceeds maximum of 10,000 bytes');
+
+      deq(Object.keys(record.ctx).sort(), ['err'])
+      eq(record.ctx.err.message, 'Log record size of 10,007 bytes exceeds maximum of 10,000 bytes');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info(Array(10000).fill('x').join(''));
+  });
+
+  it('should report the source of oversized context parameter', (t, done) => {
+    const logger = init({ test: true });
+    logger.once('message', (record) => {
+      deq(Object.keys(record).sort(), ['ctx', 'level', 'msg', 'severity', 'time'])
+      eq(record.msg, 'Log record size of 10,025 bytes exceeds maximum of 10,000 bytes');
+
+      deq(Object.keys(record.ctx).sort(), ['err'])
+      eq(record.ctx.err.message, 'Log record size of 10,025 bytes exceeds maximum of 10,000 bytes');
+      match(record.ctx.err.stack, /index.test.js/);
+      done();
+    });
+    logger.info('Some message', { x: Array(10000).fill('x').join('') });
   });
 })

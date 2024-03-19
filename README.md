@@ -19,6 +19,32 @@ This module isn't published to npm, the idea is for you to create your own organ
 
 ## Usage
 
+### Initialisation
+```js
+const { init } = require('module-acme-logging');
+const logger = init(options);
+logger.info('Some message', { foo: 'bar' });
+```
+
+### Once initialised
+```js
+const { logger } = require('module-acme-logging');
+logger.info('Some message', { foo: 'bar' });
+```
+
+## Options
+
+| Name    | Type                        | Required | Default  | Notes |
+|---------|-----------------------------|----------|----------|-------|
+| machine | boolean / transport options | no       | true     | Supported transport options are level and destination    |
+| human   | boolean                     | no       |          | Supported transport options are level and destination    |
+| test    | boolean                     | no       |          | Supported transport options are level                    |
+| als     | AsyncLocalStorage           | no       | *        | Defaults to an instance of AsyncLocalStorate             |
+| maxSize | integer                     | no       | 10,000   | Replaces the log recored with one indicating the problem |
+| sync    | boolean                     | no       | false    | See pino documentation                                   |
+
+## Examples
+
 ### Machine friendly logging
 ```js
 const { init } = require('module-acme-logging');
@@ -107,9 +133,32 @@ logger.info(undefined);
 ```
 
 ```json
-{"level":50,"severity":"info","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Empty log message"}},"msg":"Empty log message!"}
+{"level":50,"severity":"info","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Empty log message"}},"msg":"Empty log message"}
 
 ```
+The stack trace was omitted for brevity in the readme, but will be logged irl
+
+### Reporting the source of oversided log messages
+```js
+const { logger } = require('module-acme-logging');
+logger.info(new Array(10000).fill('x').join(''));
+```
+
+```json
+{"level":50,"severity":"info","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Log record size of 10,007 bytes exceeds maximum of 10,000 bytes"}},"msg":"Log record size of 10,007 bytes exceeds maximum of 10,000 bytes"}
+
+```
+
+```js
+const { logger } = require('module-acme-logging');
+logger.info('Some message', { x: new Array(10000).fill('x').join('') });
+```
+
+```json
+{"level":50,"severity":"info","time":1710696070387,"ctx":{"err":{"type":"Error","message":"Log record size of 10,025 bytes exceeds maximum of 10,000 bytes"}},"msg":"Log record size of 10,007 bytes exceeds maximum of 10,000 bytes"}
+
+```
+
 The stack trace was omitted for brevity in the readme, but will be logged irl
 
 ### Error serialisation

@@ -1,6 +1,7 @@
 const path = require('node:path');
 const { AsyncLocalStorage } = require('node:async_hooks');
 const pino = require('pino');
+const stringify = require('safe-stable-stringify');
 
 module.exports = {
   init
@@ -10,6 +11,7 @@ function init(options = { machine: true }) {
 
   // https://github.com/pinojs/pino-pretty?tab=readme-ov-file#usage-with-jest
   const sync = options?.sync || Boolean(options?.test) || false;
+  const maxSize = options?.maxSize || 10000;
   const als = options?.als || new AsyncLocalStorage();
 
   function configureMachineLogger() {
@@ -43,10 +45,10 @@ function init(options = { machine: true }) {
   };
 
   const formatters = {
-    level (label, number) {
+    level(label, number) {
       return { level: number, severity: label }
     },
-    log (object) {
+    log(object) {
       const { error, ...context } = object;
       return { err: error, ...context }
     },
@@ -56,13 +58,18 @@ function init(options = { machine: true }) {
     /*
       Defines a custom logMethod that:
         1. Exposes a conventional logging API, i.e. logger.info(message, [context])
-        2. Logs the message severity
-        3. Merges the asynchronous local storage store and the context, prefering the latter
+        2. Merges the asynchronous local storage store and the context, prefering the latter
+        3. Reports oversized messages
     */
     logMethod(inputArgs, method, level) {
       const [message, ctx] = getArgs(inputArgs);
       const store = als.getStore() || {};
-      return method.apply(this, [{ ...store, ...ctx }, message ]);
+      const outputArgs = [{ ...store, ...ctx }, message ];
+
+      const size =  Buffer.byteLength(stringify(outputArgs));
+      return size > maxSize
+        ? method.apply(this, [fail(`Log record size of ${(size).toLocaleString()} bytes exceeds maximum of ${(maxSize).toLocaleString()} bytes`)])
+        : method.apply(this, outputArgs);
     }
   }
 
@@ -133,7 +140,7 @@ function getArgs(inputArgs) {
   else if (inputArgs.length === 1) args = [undefined].concat(inputArgs);
   else args = inputArgs;
 
-  return args.some(isNotEmpty) ? args : [undefined, { err: new Error('Empty log message') }];
+  return args.some(isNotEmpty) ? args : [undefined, fail('Empty log message')];
 }
 
 function isNotEmpty(value) {
@@ -142,5 +149,9 @@ function isNotEmpty(value) {
   if (typeof value === 'string' && value.trim().length === 0) return false;
   if (typeof value === 'object' && Object.keys(value).length === 0) return false;
   return true;
+}
+
+function fail(message) {
+  return { err: new Error(message) }
 }
 

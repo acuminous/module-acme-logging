@@ -139,7 +139,7 @@ logger.info(undefined);
 ```
 The stack trace was omitted for brevity in the readme, but will be logged irl
 
-### Reporting the source of oversided log messages
+### Reporting the source of oversized log messages
 ```js
 const { logger } = require('module-acme-logging');
 logger.info(new Array(10000).fill('x').join(''));

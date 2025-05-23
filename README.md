@@ -37,12 +37,12 @@ logger.info('Some message', { foo: 'bar' });
 
 | Name    | Type                        | Required | Default  | Notes |
 |---------|-----------------------------|----------|----------|-------|
-| machine | boolean / transport options | no       | true     | Supported transport options are level and destination    |
-| human   | boolean                     | no       |          | Supported transport options are level and destination    |
-| test    | boolean                     | no       |          | Supported transport options are level                    |
-| als     | AsyncLocalStorage           | no       | *        | Defaults to an instance of AsyncLocalStorate             |
-| maxSize | integer                     | no       | 10,000   | Replaces the log recored with one indicating the problem |
-| sync    | boolean                     | no       | false    | See pino documentation                                   |
+| machine | boolean / transport options | no       | true     | Supported transport options are level and destination         |
+| human   | boolean                     | no       |          | Supported transport options are level and destination         |
+| test    | boolean                     | no       |          | Supported transport options are level                         |
+| als     | AsyncLocalStorage           | no       | *        | Defaults to an instance of AsyncLocalStorate                  |
+| maxSize | integer                     | no       | 10,000   | Replaces oversize log records with one indicating the problem |
+| sync    | boolean                     | no       | false    | See pino documentation                                        |
 
 ## Examples
 
